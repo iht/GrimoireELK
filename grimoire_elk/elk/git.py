@@ -82,6 +82,10 @@ class GitEnrich(Enrich):
     def get_fields_uuid(self):
         return ["author_uuid", "committer_uuid"]
 
+    def get_field_date(self):
+        """ Field with the date in the JSON enriched items """
+        return "grimoire_creation_date"
+
     def get_elastic_mappings(self):
 
         mapping = """
@@ -352,13 +356,14 @@ class GitEnrich(Enrich):
         if 'project' in item:
             eitem['project'] = item['project']
 
+        eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
+
         if self.sortinghat:
+            item[self.get_field_date()] = eitem[self.get_field_date()]
             eitem.update(self.get_item_sh(item, self.roles))
 
         if self.prjs_map:
             eitem.update(self.get_item_project(eitem))
-
-        eitem.update(self.get_grimoire_fields(commit["AuthorDate"], "commit"))
 
         if self.pair_programming:
             eitem = self.__add_pair_programming_metrics(commit, eitem)
