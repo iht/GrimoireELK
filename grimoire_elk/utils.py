@@ -150,6 +150,17 @@ def get_connector_name(cls):
                     found = cname
     return found
 
+def get_connector_backend_name(cls):
+    found = None
+    connectors = get_connectors()
+
+    for cname in connectors:
+        for con in connectors[cname]:
+            if cls == con:
+                # Get the perceval backend name
+                found = connectors[cname][0].__name__
+    return found
+
 def get_connectors():
 
     return {"askbot":[Askbot, AskbotOcean, AskbotEnrich, AskbotCommand],
