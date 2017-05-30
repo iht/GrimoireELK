@@ -28,7 +28,4 @@
 from .elastic import ElasticOcean
 
 class BugzillaRESTOcean(ElasticOcean):
-
-    def _fix_item(self, item):
-        bug_id = str(item["data"]["id"])
-        item["ocean-unique-id"] = bug_id+"_"+item['origin']
+    pass

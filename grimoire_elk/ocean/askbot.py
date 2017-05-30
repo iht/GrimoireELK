@@ -27,10 +27,6 @@ from .elastic import ElasticOcean
 class AskbotOcean(ElasticOcean):
     """Askbot Ocean feeder"""
 
-    def _fix_item(self, item):
-        # item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
-        item["ocean-unique-id"] = item["uuid"]
-
     @classmethod
     def get_p2o_params_from_url(cls, url):
         # askbot could include in the URL a  filters-raw-prefix T1721

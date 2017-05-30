@@ -30,5 +30,4 @@ from .elastic import ElasticOcean
 class JiraOcean(ElasticOcean):
     """JIRA Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = str(item["data"]["id"])+"_"+item['origin']
+    pass

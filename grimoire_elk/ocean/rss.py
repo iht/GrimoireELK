@@ -28,5 +28,4 @@ from .elastic import ElasticOcean
 class RSSOcean(ElasticOcean):
     """RSS Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = item["data"]["link"]
+    pass

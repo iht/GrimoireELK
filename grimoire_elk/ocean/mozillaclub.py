@@ -26,5 +26,4 @@ from grimoire_elk.ocean.elastic import ElasticOcean
 class MozillaClubOcean(ElasticOcean):
     """MozillaClub Ocean feeder"""
 
-    def _fix_item(self, item):
-        item["ocean-unique-id"] = item["uuid"]
+    pass

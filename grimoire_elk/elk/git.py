@@ -79,9 +79,6 @@ class GitEnrich(Enrich):
     def get_field_author(self):
         return "Author"
 
-    def get_field_unique_id(self):
-        return "ocean-unique-id"
-
     def get_fields_uuid(self):
         return ["author_uuid", "committer_uuid"]
 
