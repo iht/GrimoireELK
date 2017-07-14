@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# Gerrit Ocean feeder
+# StackExchange Ocean feeder
 #
 # Copyright (C) 2015 Bitergia
 #
@@ -23,21 +23,27 @@
 #   Alvaro del Castillo San Felix <acs@bitergia.com>
 #
 
-'''Gerrit Ocean feeder'''
-
 from .elastic import ElasticOcean
 
-class BugzillaRESTOcean(ElasticOcean):
+class FunctestOcean(ElasticOcean):
+    """Functest Ocean feeder"""
+
+    def _fix_item(self, item):
+        if 'details' in item["data"]:
+            if isinstance(item["data"]["details"], str):
+                # Wrong format. This field is a dict with the details or
+                # and array with dicts
+                item["data"]["details"] = {}
 
     def get_elastic_mappings(self):
-        # data.comments.text
+        # data.details has {} [] and "" values!
         mapping = '''
          {
             "dynamic":true,
                 "properties": {
                     "data": {
                         "properties": {
-                            "comments": {
+                            "details": {
                                 "dynamic":false,
                                 "properties": {}
                             }

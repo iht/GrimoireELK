@@ -28,4 +28,22 @@ from .elastic import ElasticOcean
 class RedmineOcean(ElasticOcean):
     """Redmine Ocean feeder"""
 
-    pass
+    def get_elastic_mappings(self):
+        # data.journals.notes
+        mapping = '''
+         {
+            "dynamic":true,
+                "properties": {
+                    "data": {
+                        "properties": {
+                            "journals": {
+                                "dynamic":false,
+                                "properties": {}
+                            }
+                        }
+                    }
+                }
+        }
+        '''
+
+        return {"items":mapping}
