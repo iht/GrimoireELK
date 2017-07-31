@@ -24,9 +24,14 @@
 #
 
 import argparse
-from dateutil import parser
 import logging
 import sys
+
+from urllib.parse import urljoin
+
+import requests
+
+from dateutil import parser
 
 from .ocean.elastic import ElasticOcean
 
@@ -36,6 +41,7 @@ from .ocean.bugzilla import BugzillaOcean
 from .ocean.bugzillarest import BugzillaRESTOcean
 from .ocean.confluence import ConfluenceOcean
 from .ocean.discourse import DiscourseOcean
+from .ocean.dockerhub import DockerHubOcean
 from .ocean.functest import FunctestOcean
 from .ocean.gerrit import GerritOcean
 from .ocean.git import GitOcean
@@ -63,6 +69,7 @@ from .elk.askbot import AskbotEnrich
 from .elk.bugzilla import BugzillaEnrich
 from .elk.bugzillarest import BugzillaRESTEnrich
 from .elk.confluence import ConfluenceEnrich
+from .elk.dockerhub import DockerHubEnrich
 from .elk.discourse import DiscourseEnrich
 from .elk.functest import FunctestEnrich
 from .elk.git import GitEnrich
@@ -96,6 +103,7 @@ from perceval.backends.core.bugzilla import Bugzilla, BugzillaCommand
 from perceval.backends.core.bugzillarest import BugzillaREST, BugzillaRESTCommand
 from perceval.backends.core.discourse import Discourse, DiscourseCommand
 from perceval.backends.core.confluence import Confluence, ConfluenceCommand
+from perceval.backends.core.dockerhub import DockerHub, DockerHubCommand
 from perceval.backends.core.gerrit import Gerrit, GerritCommand
 from perceval.backends.core.git import Git, GitCommand
 from perceval.backends.core.github import GitHub, GitHubCommand
@@ -127,6 +135,7 @@ from .elk.elastic import ElasticConnectException
 
 logger = logging.getLogger(__name__)
 
+kibiter_version = None
 
 def get_connector_from_name(name):
     found = None
@@ -171,6 +180,7 @@ def get_connectors():
             "bugzillarest":[BugzillaREST, BugzillaRESTOcean, BugzillaRESTEnrich, BugzillaRESTCommand],
             "confluence":[Confluence, ConfluenceOcean, ConfluenceEnrich, ConfluenceCommand],
             "discourse":[Discourse, DiscourseOcean, DiscourseEnrich, DiscourseCommand],
+            "dockerhub":[DockerHub, DockerHubOcean, DockerHubEnrich, DockerHubCommand],
             "functest":[Functest, FunctestOcean, FunctestEnrich, FunctestCommand],
             "gerrit":[Gerrit, GerritOcean, GerritEnrich, GerritCommand],
             "git":[Git, GitOcean, GitEnrich, GitCommand],
@@ -201,6 +211,10 @@ def get_connectors():
 def get_elastic(url, es_index, clean = None, backend = None):
 
     mapping = None
+    global kibiter_version
+
+    if kibiter_version is None:
+        kibiter_version = get_kibiter_version(url)
 
     if backend:
         mapping = backend.get_elastic_mappings()
@@ -214,6 +228,25 @@ def get_elastic(url, es_index, clean = None, backend = None):
         sys.exit(1)
 
     return elastic
+
+def get_kibiter_version(url):
+    """
+        Return kibiter major number version
+
+        The url must point to the Elasticsearch used by Kibiter
+    """
+
+    config_url = '.kibana/config/_search'
+    # Avoid having // in the URL because ES will fail
+    if url[-1] != '/':
+        url += "/"
+    url += config_url
+    r = requests.get(url)
+    r.raise_for_status()
+    version = r.json()['hits']['hits'][0]['_id']
+    # 5.4.0-SNAPSHOT
+    major_version = version.split(".", 1)[0]
+    return major_version
 
 def config_logging(debug):
 
