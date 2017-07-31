@@ -27,7 +27,6 @@
 
 
 import inspect
-import json
 import logging
 
 from datetime import datetime
@@ -125,7 +124,7 @@ class ElasticOcean(ElasticItems):
         # Also add timestamp used in incremental enrichment
         item['metadata__timestamp'] = timestamp.isoformat()
 
-    def feed(self, from_date=None, from_offset=None, category=None):
+    def feed(self, from_date=None, from_offset=None, category=None, arthur_items=None):
         """ Feed data in Elastic from Perceval """
 
         if from_date and from_offset:
@@ -166,6 +165,8 @@ class ElasticOcean(ElasticItems):
         items_pack = []  # to feed item in packs
         drop = 0
         added = 0
+
+
         if self.fetch_cache:
             items = self.perceval_backend.fetch_from_cache()
         else:
@@ -188,6 +189,9 @@ class ElasticOcean(ElasticItems):
                     items = self.perceval_backend.fetch(category=category)
                 else:
                     items = self.perceval_backend.fetch()
+
+        if arthur_items:
+            items = arthur_items
 
         for item in items:
             # print("%s %s" % (item['url'], item['lastUpdated_date']))
